@@ -42,13 +42,13 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([])
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('User Management'),
+                    ->label('Manajemen Pengguna'),
                 NavigationGroup::make()
-                    ->label('Attendance'),
+                    ->label('Absensi'),
                 NavigationGroup::make()
-                    ->label('Schedule Management'),
+                    ->label('Manajemen Jadwal'),
                 NavigationGroup::make()
-                    ->label('Settings'),
+                    ->label('Pengaturan'),
             ])
             ->databaseNotifications()
             ->middleware([

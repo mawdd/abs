@@ -20,9 +20,13 @@ class ClassScheduleResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar';
     
-    protected static ?string $navigationLabel = 'Class Schedules';
+    protected static ?string $navigationLabel = 'Jadwal Kelas';
     
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
+    
+    protected static ?string $modelLabel = 'Jadwal Kelas';
+    
+    protected static ?string $pluralModelLabel = 'Jadwal Kelas';
 
     public static function form(Form $form): Form
     {
@@ -33,45 +37,53 @@ class ClassScheduleResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required()
+                    ->label('Mata Pelajaran')
                     ->createOptionForm([
                         Forms\Components\TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->label('Nama'),
                         Forms\Components\Textarea::make('description')
-                            ->maxLength(65535),
+                            ->maxLength(65535)
+                            ->label('Deskripsi'),
                     ]),
                 Forms\Components\Select::make('class_room_id')
                     ->relationship('classRoom', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->label('Ruang Kelas'),
                 Forms\Components\Select::make('teacher_id')
                     ->relationship('teacher', 'name')
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->label('Teacher'),
+                    ->label('Guru'),
                 Forms\Components\Select::make('day_of_week')
                     ->options([
-                        1 => 'Monday',
-                        2 => 'Tuesday',
-                        3 => 'Wednesday',
-                        4 => 'Thursday',
-                        5 => 'Friday',
-                        6 => 'Saturday',
-                        7 => 'Sunday',
+                        1 => 'Senin',
+                        2 => 'Selasa',
+                        3 => 'Rabu',
+                        4 => 'Kamis',
+                        5 => 'Jumat',
+                        6 => 'Sabtu',
+                        7 => 'Minggu',
                     ])
-                    ->required(),
+                    ->required()
+                    ->label('Hari'),
                 Forms\Components\TimePicker::make('start_time')
                     ->seconds(false)
-                    ->required(),
+                    ->required()
+                    ->label('Waktu Mulai'),
                 Forms\Components\TimePicker::make('end_time')
                     ->seconds(false)
                     ->required()
-                    ->after('start_time'),
+                    ->after('start_time')
+                    ->label('Waktu Selesai'),
                 Forms\Components\Toggle::make('is_active')
                     ->default(true)
-                    ->required(),
+                    ->required()
+                    ->label('Aktif'),
             ])
             ->columns(2);
     }
@@ -82,13 +94,16 @@ class ClassScheduleResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('subject.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Mata Pelajaran'),
                 Tables\Columns\TextColumn::make('classRoom.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Ruang Kelas'),
                 Tables\Columns\TextColumn::make('teacher.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Guru'),
                 Tables\Columns\TextColumn::make('day_name')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -97,63 +112,71 @@ class ClassScheduleResource extends Resource
                         'Saturday', 'Sunday' => 'warning',
                         default => 'gray',
                     })
-                    ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('day_of_week', $direction)),
+                    ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('day_of_week', $direction))
+                    ->label('Hari'),
                 Tables\Columns\TextColumn::make('time_range')
-                    ->label('Time')
+                    ->label('Waktu')
                     ->searchable(query: fn (Builder $query, string $search): Builder => $query
                         ->where('start_time', 'like', "%{$search}%")
                         ->orWhere('end_time', 'like', "%{$search}%"))
                     ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('start_time', $direction)),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Aktif'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Dibuat Pada'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Diperbarui Pada'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('subject')
-                    ->relationship('subject', 'name'),
+                    ->relationship('subject', 'name')
+                    ->label('Mata Pelajaran'),
                 Tables\Filters\SelectFilter::make('class_room')
-                    ->relationship('classRoom', 'name'),
+                    ->relationship('classRoom', 'name')
+                    ->label('Ruang Kelas'),
                 Tables\Filters\SelectFilter::make('teacher')
-                    ->relationship('teacher', 'name'),
+                    ->relationship('teacher', 'name')
+                    ->label('Guru'),
                 Tables\Filters\SelectFilter::make('day_of_week')
                     ->options([
-                        1 => 'Monday',
-                        2 => 'Tuesday',
-                        3 => 'Wednesday',
-                        4 => 'Thursday',
-                        5 => 'Friday',
-                        6 => 'Saturday',
-                        7 => 'Sunday',
-                    ]),
+                        1 => 'Senin',
+                        2 => 'Selasa',
+                        3 => 'Rabu',
+                        4 => 'Kamis',
+                        5 => 'Jumat',
+                        6 => 'Sabtu',
+                        7 => 'Minggu',
+                    ])
+                    ->label('Hari'),
                 Tables\Filters\TernaryFilter::make('is_active')
-                    ->label('Active Status')
-                    ->placeholder('All Schedules')
-                    ->trueLabel('Active Schedules')
-                    ->falseLabel('Inactive Schedules'),
+                    ->label('Status Aktif')
+                    ->placeholder('Semua Jadwal')
+                    ->trueLabel('Jadwal Aktif')
+                    ->falseLabel('Jadwal Tidak Aktif'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus'),
                     Tables\Actions\BulkAction::make('activate')
-                        ->label('Activate Selected')
+                        ->label('Aktifkan Terpilih')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => true]))
                         ->requiresConfirmation(),
                     Tables\Actions\BulkAction::make('deactivate')
-                        ->label('Deactivate Selected')
+                        ->label('Nonaktifkan Terpilih')
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
                         ->action(fn (Collection $records) => $records->each->update(['is_active' => false]))

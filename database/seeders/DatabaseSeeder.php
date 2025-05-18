@@ -66,19 +66,17 @@ class DatabaseSeeder extends Seeder
         $holidays = [
             [
                 'date' => now()->addDays(5)->startOfDay(),
-                'name' => 'School Event',
+                'title' => 'School Event',
                 'description' => 'Annual school event',
-                'type' => 'school',
-                'is_active' => true,
-                'created_by' => 1, // Admin user
+                'is_recurring' => false,
+                'is_national_holiday' => false,
             ],
             [
                 'date' => now()->addDays(10)->startOfDay(),
-                'name' => 'Independence Day',
+                'title' => 'Independence Day',
                 'description' => 'National holiday',
-                'type' => 'national',
-                'is_active' => true,
-                'created_by' => 1, // Admin user
+                'is_recurring' => false,
+                'is_national_holiday' => true,
             ],
         ];
         

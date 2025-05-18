@@ -17,9 +17,9 @@ class ClassRoomResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office-2';
     
-    protected static ?string $navigationGroup = 'Academic Management';
+    protected static ?string $navigationGroup = 'Manajemen Akademik';
     
-    protected static ?string $navigationLabel = 'Classrooms';
+    protected static ?string $navigationLabel = 'Ruang Kelas';
 
     public static function form(Form $form): Form
     {

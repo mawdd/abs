@@ -19,9 +19,9 @@ class TeacherProfileResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
     
-    protected static ?string $navigationLabel = 'Teacher Profiles';
+    protected static ?string $navigationLabel = 'Profil Guru';
     
-    protected static ?string $navigationGroup = 'Staff Management';
+    protected static ?string $navigationGroup = 'Manajemen Staf';
 
     public static function form(Form $form): Form
     {
