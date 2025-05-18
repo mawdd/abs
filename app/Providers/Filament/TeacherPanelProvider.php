@@ -2,12 +2,10 @@
 
 namespace App\Providers\Filament;
 
-use App\Models\User;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -20,36 +18,25 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class AdminPanelProvider extends PanelProvider
+class TeacherPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
+            ->id('teacher')
+            ->path('teacher')
             ->login()
             ->colors([
-                'primary' => Color::Emerald,
+                'primary' => Color::Indigo,
             ])
             ->darkMode()
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverResources(in: app_path('Filament/Teacher/Resources'), for: 'App\\Filament\\Teacher\\Resources')
+            ->discoverPages(in: app_path('Filament/Teacher/Pages'), for: 'App\\Filament\\Teacher\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Teacher/Widgets'), for: 'App\\Filament\\Teacher\\Widgets')
             ->widgets([])
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('User Management'),
-                NavigationGroup::make()
-                    ->label('Attendance'),
-                NavigationGroup::make()
-                    ->label('Schedule Management'),
-                NavigationGroup::make()
-                    ->label('Settings'),
-            ])
             ->databaseNotifications()
             ->middleware([
                 EncryptCookies::class,
@@ -66,8 +53,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->authGuard('web')
-            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
-            ->globalSearch(true)
-            ->sidebarCollapsibleOnDesktop();
+            ->maxContentWidth('full');
     }
 }

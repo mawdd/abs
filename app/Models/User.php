@@ -6,29 +6,36 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'role',
+        'phone_number',
+        'is_active',
+        'device_info',
     ];
 
     /**
      * The attributes that should be hidden for serialization.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $hidden = [
         'password',
@@ -36,26 +43,70 @@ class User extends Authenticatable implements FilamentUser
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that should be cast.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+        'is_active' => 'boolean',
+        'device_info' => 'json',
+    ];
     
     /**
-     * Determine if the user can access the Filament admin panel.
-     *
-     * @param Panel $panel
-     * @return bool
+     * Determine if the user can access the Filament panel.
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true; // Allow any user to access the admin panel
+        if ($panel->getId() === 'admin') {
+            return $this->role === 'admin';
+        }
+        
+        if ($panel->getId() === 'teacher') {
+            return $this->role === 'teacher' && $this->is_active;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Get all attendances for the user.
+     */
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(Attendance::class);
+    }
+    
+    /**
+     * Get all schedules for the user.
+     */
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(Schedule::class);
+    }
+    
+    /**
+     * Get all device registrations for the user.
+     */
+    public function deviceRegistrations(): HasMany
+    {
+        return $this->hasMany(DeviceRegistration::class);
+    }
+    
+    /**
+     * Check if user is admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+    
+    /**
+     * Check if user is teacher.
+     */
+    public function isTeacher(): bool
+    {
+        return $this->role === 'teacher';
     }
 }
