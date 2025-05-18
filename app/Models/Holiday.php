@@ -16,12 +16,11 @@ class Holiday extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'title',
         'date',
-        'name',
         'description',
-        'type',
-        'is_active',
-        'created_by',
+        'is_recurring',
+        'is_national_holiday',
     ];
     
     /**
@@ -31,31 +30,40 @@ class Holiday extends Model
      */
     protected $casts = [
         'date' => 'date',
-        'is_active' => 'boolean',
+        'is_recurring' => 'boolean',
+        'is_national_holiday' => 'boolean',
     ];
     
     /**
-     * Get the user who created the holiday.
+     * Scope a query to only include national holidays.
      */
-    public function createdBy(): BelongsTo
+    public function scopeNational($query)
     {
-        return $this->belongsTo(User::class, 'created_by');
+        return $query->where('is_national_holiday', true);
     }
     
     /**
-     * Scope a query to only include active holidays.
+     * Scope a query to only include school-specific holidays.
      */
-    public function scopeActive($query)
+    public function scopeSchoolSpecific($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('is_national_holiday', false);
     }
     
     /**
-     * Scope a query to only include holidays of a specific type.
+     * Scope a query to only include recurring holidays.
      */
-    public function scopeOfType($query, $type)
+    public function scopeRecurring($query)
     {
-        return $query->where('type', $type);
+        return $query->where('is_recurring', true);
+    }
+    
+    /**
+     * Scope a query to only include non-recurring holidays.
+     */
+    public function scopeNonRecurring($query)
+    {
+        return $query->where('is_recurring', false);
     }
     
     /**
@@ -87,6 +95,19 @@ class Holiday extends Model
      */
     public static function isHoliday($date): bool
     {
-        return static::active()->forDate($date)->exists();
+        $dateObj = is_string($date) ? new \DateTime($date) : $date;
+        $formattedDate = $dateObj->format('Y-m-d');
+        
+        // Check for exact date match
+        $exactMatch = static::where('date', $formattedDate)->exists();
+        if ($exactMatch) {
+            return true;
+        }
+        
+        // Check for recurring holidays (matching month and day)
+        $monthDay = $dateObj->format('m-d');
+        return static::recurring()
+            ->whereRaw("DATE_FORMAT(date, '%m-%d') = ?", [$monthDay])
+            ->exists();
     }
 }

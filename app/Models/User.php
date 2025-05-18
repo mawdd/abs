@@ -109,4 +109,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->role === 'teacher';
     }
+
+    /**
+     * Get the teacher profile associated with the user.
+     */
+    public function teacherProfile()
+    {
+        return $this->hasOne(TeacherProfile::class);
+    }
 }

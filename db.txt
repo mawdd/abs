@@ -1,0 +1,85 @@
+# Database Schema for School Attendance Management System
+
+## Users
+- id: bigint (primary key, auto-increment)
+- name: string
+- email: string (unique)
+- email_verified_at: timestamp (nullable)
+- password: string
+- role: enum ['admin', 'teacher']
+- remember_token: string (nullable)
+- created_at: timestamp
+- updated_at: timestamp
+
+## Subjects
+- id: bigint (primary key, auto-increment)
+- name: string
+- description: text (nullable)
+- created_at: timestamp
+- updated_at: timestamp
+
+## ClassRooms
+- id: bigint (primary key, auto-increment)
+- name: string
+- capacity: integer (nullable)
+- location: string (nullable)
+- created_at: timestamp
+- updated_at: timestamp
+
+## TeacherSubjects
+- id: bigint (primary key, auto-increment)
+- teacher_id: bigint (foreign key to users table)
+- subject_id: bigint (foreign key to subjects table)
+- created_at: timestamp
+- updated_at: timestamp
+
+## ClassSchedules
+- id: bigint (primary key, auto-increment)
+- subject_id: bigint (foreign key to subjects table)
+- class_room_id: bigint (foreign key to class_rooms table)
+- teacher_id: bigint (foreign key to users table where role = 'teacher')
+- day_of_week: integer (1-7, representing Monday-Sunday)
+- start_time: time
+- end_time: time
+- created_at: timestamp
+- updated_at: timestamp
+
+## Attendances
+- id: bigint (primary key, auto-increment)
+- user_id: bigint (foreign key to users table)
+- schedule_id: bigint (foreign key to class_schedules table)
+- date: date
+- check_in_time: timestamp
+- check_out_time: timestamp (nullable)
+- status: enum ['present', 'absent', 'late', 'leave']
+- location_latitude: decimal (nullable)
+- location_longitude: decimal (nullable)
+- created_at: timestamp
+- updated_at: timestamp
+
+## DeviceRegistrations
+- id: bigint (primary key, auto-increment)
+- user_id: bigint (foreign key to users table)
+- device_identifier: string
+- device_name: string
+- is_active: boolean (default: true)
+- created_at: timestamp
+- updated_at: timestamp
+
+## Holidays
+- id: bigint (primary key, auto-increment)
+- title: string
+- description: text (nullable)
+- date: date
+- is_recurring: boolean (default: false)
+- created_at: timestamp
+- updated_at: timestamp
+
+## AttendanceExceptions
+- id: bigint (primary key, auto-increment)
+- user_id: bigint (foreign key to users table)
+- date: date
+- reason: text (nullable)
+- status: enum ['approved', 'pending', 'rejected']
+- created_at: timestamp
+- updated_at: timestamp 
