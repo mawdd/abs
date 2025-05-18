@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // First drop the foreign key constraint
+        Schema::table('holidays', function (Blueprint $table) {
+            $table->dropForeign('holidays_created_by_foreign');
+        });
+        
         Schema::table('holidays', function (Blueprint $table) {
             // Drop the unique constraint on date
             $table->dropUnique('holidays_date_unique');
@@ -48,7 +53,7 @@ return new class extends Migration
             // Add back the old columns
             $table->enum('type', ['national', 'school', 'special_event'])->default('school');
             $table->boolean('is_active')->default(true);
-            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('created_by')->nullable();
             
             // Add back the unique constraint on date
             $table->unique('date');
