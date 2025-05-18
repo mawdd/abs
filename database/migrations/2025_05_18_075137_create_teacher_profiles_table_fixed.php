@@ -11,10 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('teacher_profiles_table_fixed', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('teacher_profiles')) {
+            Schema::create('teacher_profiles', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->string('qualification')->nullable();
+                $table->text('bio')->nullable();
+                $table->string('specialization')->nullable();
+                $table->string('profile_photo')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('teacher_profiles_table_fixed');
+        Schema::dropIfExists('teacher_profiles');
     }
 };
