@@ -15,7 +15,7 @@ return new class extends Migration
         if (!Schema::hasTable('holidays')) {
             Schema::create('holidays', function (Blueprint $table) {
                 $table->id();
-                $table->string('title');
+                $table->string('title', 191);
                 $table->text('description')->nullable();
                 $table->date('date');
                 $table->boolean('is_recurring')->default(false);

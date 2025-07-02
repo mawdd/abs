@@ -8,7 +8,8 @@
     <title>{{ config('app.name', 'Sistem Absensi Guru') }}</title>
 
     <!-- Scripts and Styles -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- @vite(['resources/css/app.css', 'resources/js/app.js']) --}}
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <!-- Add Tailwind CDN for quick styling -->
     <script src="https://cdn.tailwindcss.com"></script>

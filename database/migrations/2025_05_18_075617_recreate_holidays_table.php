@@ -17,7 +17,7 @@ return new class extends Migration
         // Create a new holidays table with the correct structure
         Schema::create('holidays', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
+            $table->string('title', 191);
             $table->text('description')->nullable();
             $table->date('date');
             $table->boolean('is_recurring')->default(false);
