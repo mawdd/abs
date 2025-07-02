@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Schema;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,6 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Fix for MySQL index length limit on older versions/shared hosting
+        Schema::defaultStringLength(191);
+        
         // Force HTTPS for Ngrok URLs
         if (str_contains(request()->getHost(), 'ngrok.io') ||
             str_contains(request()->getHost(), 'ngrok-free.app') ||
