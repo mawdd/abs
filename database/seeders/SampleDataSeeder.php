@@ -22,14 +22,14 @@ class SampleDataSeeder extends Seeder
     {
         $this->command->info('Seeding sample data for complete dashboard...');
 
+        // Create subjects and classes first
+        $this->createSubjectsAndClasses();
+        
         // Create more teachers
         $this->createTeachers();
         
-        // Create students
+        // Create students (after classes exist)
         $this->createStudents();
-        
-        // Create subjects and classes
-        $this->createSubjectsAndClasses();
         
         // Create sample attendance records
         $this->createAttendanceRecords();
@@ -71,10 +71,9 @@ class SampleDataSeeder extends Seeder
             TeacherProfile::firstOrCreate(
                 ['user_id' => $user->id],
                 [
-                    'phone' => '081' . rand(10000000, 99999999),
-                    'address' => 'Jl. Pendidikan No. ' . rand(1, 100),
-                    'date_of_birth' => Carbon::now()->subYears(rand(25, 50)),
-                    'hire_date' => Carbon::now()->subYears(rand(1, 10)),
+                    'phone_number' => '081' . rand(10000000, 99999999),
+                    'bio' => 'Guru ' . $teacherData['subject'] . ' berpengalaman dengan dedikasi tinggi',
+                    'education' => 'S1 ' . $teacherData['subject'],
                     'qualification' => 'S1 ' . $teacherData['subject'],
                     'specialization' => $teacherData['subject'],
                 ]
@@ -95,16 +94,23 @@ class SampleDataSeeder extends Seeder
             'Zahra Alifah', 'Alif Rahman', 'Bella Anjani', 'Cakra Wijaya', 'Dina Marlina'
         ];
 
+        // Get class rooms first
+        $classRooms = ClassRoom::all();
+        
         foreach ($students as $index => $name) {
             Student::firstOrCreate(
-                ['student_number' => 'STD' . str_pad($index + 1, 4, '0', STR_PAD_LEFT)],
+                ['student_id' => 'STD' . str_pad($index + 1, 4, '0', STR_PAD_LEFT)],
                 [
                     'name' => $name,
                     'email' => strtolower(str_replace(' ', '.', $name)) . '@student.com',
-                    'phone' => '081' . rand(10000000, 99999999),
-                    'address' => 'Jl. Siswa No. ' . rand(1, 100),
+                    'phone_number' => '081' . rand(10000000, 99999999),
+                    'class_room_id' => $classRooms->isNotEmpty() ? $classRooms->random()->id : null,
                     'date_of_birth' => Carbon::now()->subYears(rand(15, 18)),
-                    'grade' => rand(10, 12),
+                    'gender' => rand(0, 1) ? 'male' : 'female',
+                    'address' => 'Jl. Siswa No. ' . rand(1, 100),
+                    'parent_name' => 'Orang Tua ' . $name,
+                    'parent_phone' => '081' . rand(10000000, 99999999),
+                    'is_active' => true,
                 ]
             );
         }
@@ -123,8 +129,6 @@ class SampleDataSeeder extends Seeder
             Subject::firstOrCreate(
                 ['name' => $subject],
                 [
-                    'code' => strtoupper(substr($subject, 0, 3)) . rand(100, 999),
-                    'credits' => rand(2, 4),
                     'description' => 'Mata pelajaran ' . $subject,
                 ]
             );
@@ -162,6 +166,11 @@ class SampleDataSeeder extends Seeder
                     $checkInTime = $date->copy()->setTime(rand(7, 8), rand(0, 59));
                     $checkOutTime = $date->copy()->setTime(rand(15, 17), rand(0, 59));
                     
+                    $checkInLat = -6.562997 + (rand(-100, 100) / 10000);
+                    $checkInLng = 110.860587 + (rand(-100, 100) / 10000);
+                    $checkOutLat = -6.562997 + (rand(-100, 100) / 10000);
+                    $checkOutLng = 110.860587 + (rand(-100, 100) / 10000);
+                    
                     Attendance::firstOrCreate(
                         [
                             'user_id' => $teacher->id,
@@ -170,12 +179,12 @@ class SampleDataSeeder extends Seeder
                         [
                             'check_in_time' => $checkInTime,
                             'check_out_time' => $checkOutTime,
-                            'check_in_location_lat' => -6.562997 + (rand(-100, 100) / 10000),
-                            'check_in_location_lng' => 110.860587 + (rand(-100, 100) / 10000),
-                            'check_out_location_lat' => -6.562997 + (rand(-100, 100) / 10000),
-                            'check_out_location_lng' => 110.860587 + (rand(-100, 100) / 10000),
+                            'check_in_location' => json_encode(['latitude' => $checkInLat, 'longitude' => $checkInLng]),
+                            'check_out_location' => json_encode(['latitude' => $checkOutLat, 'longitude' => $checkOutLng]),
                             'check_in_location_valid' => rand(1, 100) <= 90, // 90% valid
                             'check_out_location_valid' => rand(1, 100) <= 90,
+                            'status' => 'present',
+                            'is_holiday' => false,
                         ]
                     );
                 }
@@ -210,13 +219,16 @@ class SampleDataSeeder extends Seeder
                         'teacher_id' => $teacher->id,
                         'subject_id' => $subject->id,
                         'class_room_id' => $class->id,
+                        'date' => $date->format('Y-m-d'),
                         'start_time' => $startTime,
                     ],
                     [
                         'end_time' => $endTime,
-                        'location_lat' => -6.562997,
-                        'location_lng' => 110.860587,
-                        'location_valid' => true,
+                        'start_location' => json_encode(['latitude' => -6.562997, 'longitude' => 110.860587]),
+                        'end_location' => $endTime ? json_encode(['latitude' => -6.562997, 'longitude' => 110.860587]) : null,
+                        'start_location_valid' => true,
+                        'end_location_valid' => $endTime ? true : false,
+                        'status' => $endTime ? 'completed' : 'active',
                         'notes' => 'Pembelajaran ' . $subject->name . ' di kelas ' . $class->name,
                     ]
                 );
@@ -239,9 +251,10 @@ class SampleDataSeeder extends Seeder
             Holiday::firstOrCreate(
                 ['date' => $holiday['date']->format('Y-m-d')],
                 [
-                    'name' => $holiday['name'],
+                    'title' => $holiday['name'],
                     'description' => 'Hari libur ' . $holiday['name'],
                     'is_recurring' => true,
+                    'is_national_holiday' => true,
                 ]
             );
         }

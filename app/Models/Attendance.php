@@ -22,9 +22,12 @@ class Attendance extends Model
         'check_out_time',
         'check_in_location',
         'check_out_location',
+        'check_in_location_valid',
+        'check_out_location_valid',
         'check_in_device_info',
         'check_out_device_info',
         'status',
+        'is_holiday',
         'notes',
     ];
     
@@ -39,6 +42,9 @@ class Attendance extends Model
         'check_out_time' => 'datetime',
         'check_in_location' => 'json',
         'check_out_location' => 'json',
+        'check_in_location_valid' => 'boolean',
+        'check_out_location_valid' => 'boolean',
+        'is_holiday' => 'boolean',
     ];
     
     /**
