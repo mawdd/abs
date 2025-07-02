@@ -101,6 +101,40 @@ Route::get('/increase-radius/{meters?}', function ($meters = 500) {
     return response()->json(['error' => 'No primary location found']);
 });
 
+// Quick route to set school coordinates easily
+Route::get('/set-school-location/{lat}/{lng}/{radius?}', function ($lat, $lng, $radius = 100) {
+    $location = AttendanceLocation::where('is_primary', true)->first();
+    
+    if ($location) {
+        $location->update([
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'radius_meters' => $radius,
+        ]);
+    } else {
+        AttendanceLocation::create([
+            'name' => 'Main School Building',
+            'latitude' => $lat,
+            'longitude' => $lng,
+            'radius_meters' => $radius,
+            'is_active' => true,
+            'is_primary' => true,
+            'description' => 'Primary attendance location for the school',
+        ]);
+    }
+    
+    return response()->json([
+        'success' => true,
+        'message' => "School location updated to coordinates: {$lat}, {$lng} with {$radius}m radius",
+        'location' => AttendanceLocation::where('is_primary', true)->first(),
+    ]);
+});
+
+// PWA Offline support
+Route::get('/offline', function () {
+    return view('offline');
+});
+
 // Unified Login System - Satu halaman login untuk semua user
 Route::get('/', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');

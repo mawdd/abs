@@ -3,9 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Riwayat Absensi - {{ config('app.name') }}</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="application-name" content="Sistem Absensi Guru">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Absensi Guru">
+    <meta name="description" content="Riwayat absensi guru">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#3b82f6">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        @media (display-mode: standalone) {
+            body {
+                -webkit-user-select: none;
+                -webkit-touch-callout: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen">
     <div class="container mx-auto px-4 py-6 max-w-4xl">
@@ -13,8 +41,20 @@
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center justify-between">
                 <div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="flex items-center">
+                            <i class="fas fa-user-circle text-2xl text-gray-400 mr-2"></i>
+                            <span class="text-sm text-gray-600">{{ auth()->user()->name }}</span>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
+                            @csrf
+                            <button type="submit" class="text-sm text-red-600 hover:text-red-800 flex items-center transition-colors">
+                                <i class="fas fa-sign-out-alt mr-1"></i>
+                                Logout
+                            </button>
+                        </form>
+                    </div>
                     <h1 class="text-2xl font-bold text-gray-800">Riwayat Absensi</h1>
-                    <p class="text-gray-600">{{ auth()->user()->name }}</p>
                 </div>
                 <a href="{{ route('teacher.attendance') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
                     <i class="fas fa-arrow-left mr-2"></i>

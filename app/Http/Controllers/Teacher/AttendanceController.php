@@ -52,6 +52,16 @@ class AttendanceController extends Controller
             $user = Auth::user();
             $today = Carbon::today();
             
+            // Validate user is still authenticated and active
+            if (!$user || $user->role !== 'teacher' || !$user->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session tidak valid. Silakan login ulang.',
+                    'redirect' => true,
+                    'redirect_url' => route('login')
+                ], 401);
+            }
+            
             // Check if already checked in
             $existingAttendance = Attendance::where('user_id', $user->id)
                 ->whereDate('date', $today)
@@ -73,12 +83,32 @@ class AttendanceController extends Controller
             $locationValidation = $this->validateLocation($latitude, $longitude);
             $primaryLocation = AttendanceLocation::where('is_primary', true)->first();
             
-            // Reject if location is not valid
-            if (!$locationValidation['valid']) {
+            // Check if location is valid OR admin override is requested
+            $adminOverride = $this->isAdminOverride($request);
+            
+            if (!$locationValidation['valid'] && !$adminOverride) {
+                \Log::warning('Teacher check-in outside valid area', [
+                    'user_id' => $user->id,
+                    'user_location' => ['lat' => $latitude, 'lng' => $longitude],
+                    'distance' => $locationValidation['distance'],
+                    'allowed_radius' => $locationValidation['allowed_radius']
+                ]);
+                
+                // Return warning but allow admin override
                 return response()->json([
                     'success' => false,
                     'message' => $locationValidation['message'] . ' (Jarak: ' . $locationValidation['distance'] . 'm, Max: ' . $locationValidation['allowed_radius'] . 'm)',
-                    'location_validation' => $locationValidation
+                    'location_validation' => $locationValidation,
+                    'allow_override' => auth()->user()->role === 'admin' // Admin can override
+                ]);
+            }
+            
+            // Log admin override if used
+            if ($adminOverride) {
+                \Log::info('Admin override used for check-in', [
+                    'user_id' => $user->id,
+                    'admin_id' => auth()->id(),
+                    'distance' => $locationValidation['distance']
                 ]);
             }
             
@@ -119,10 +149,16 @@ class AttendanceController extends Controller
             ]);
             
         } catch (\Exception $e) {
+            \Log::error('Check-in error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ]);
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi admin.'
+            ], 500);
         }
     }
 
@@ -134,6 +170,16 @@ class AttendanceController extends Controller
         try {
             $user = Auth::user();
             $today = Carbon::today();
+            
+            // Validate user is still authenticated and active
+            if (!$user || $user->role !== 'teacher' || !$user->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Session tidak valid. Silakan login ulang.',
+                    'redirect' => true,
+                    'redirect_url' => route('login')
+                ], 401);
+            }
             
             // Get today's attendance
             $attendance = Attendance::where('user_id', $user->id)
@@ -163,12 +209,32 @@ class AttendanceController extends Controller
             $locationValidation = $this->validateLocation($latitude, $longitude);
             $primaryLocation = AttendanceLocation::where('is_primary', true)->first();
             
-            // Reject if location is not valid
-            if (!$locationValidation['valid']) {
+            // Check if location is valid OR admin override is requested
+            $adminOverride = $this->isAdminOverride($request);
+            
+            if (!$locationValidation['valid'] && !$adminOverride) {
+                \Log::warning('Teacher check-out outside valid area', [
+                    'user_id' => $user->id,
+                    'user_location' => ['lat' => $latitude, 'lng' => $longitude],
+                    'distance' => $locationValidation['distance'],
+                    'allowed_radius' => $locationValidation['allowed_radius']
+                ]);
+                
+                // Return warning but allow admin override
                 return response()->json([
                     'success' => false,
                     'message' => $locationValidation['message'] . ' (Jarak: ' . $locationValidation['distance'] . 'm, Max: ' . $locationValidation['allowed_radius'] . 'm)',
-                    'location_validation' => $locationValidation
+                    'location_validation' => $locationValidation,
+                    'allow_override' => auth()->user()->role === 'admin' // Admin can override
+                ]);
+            }
+            
+            // Log admin override if used
+            if ($adminOverride) {
+                \Log::info('Admin override used for check-out', [
+                    'user_id' => $user->id,
+                    'admin_id' => auth()->id(),
+                    'distance' => $locationValidation['distance']
                 ]);
             }
             
@@ -199,10 +265,16 @@ class AttendanceController extends Controller
             ]);
             
         } catch (\Exception $e) {
+            \Log::error('Check-out error', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
-            ]);
+                'message' => 'Terjadi kesalahan sistem. Silakan coba lagi atau hubungi admin.'
+            ], 500);
         }
     }
 
@@ -281,5 +353,15 @@ class AttendanceController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1-$a));
         
         return $earthRadius * $c;
+    }
+
+    /**
+     * Check if admin override is requested and valid
+     */
+    private function isAdminOverride($request): bool
+    {
+        return $request->header('X-Admin-Override') === 'true' && 
+               $request->input('admin_override') === true &&
+               auth()->user()->role === 'admin';
     }
 } 

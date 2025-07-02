@@ -20,8 +20,8 @@ class AttendanceLocation extends Model
     ];
     
     protected $casts = [
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
+        'latitude' => 'decimal:12',
+        'longitude' => 'decimal:12',
         'radius_meters' => 'integer',
         'is_active' => 'boolean',
         'is_primary' => 'boolean',

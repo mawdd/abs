@@ -29,7 +29,12 @@
                 <h1 class="text-xl font-bold">{{ __('attendance.daily_attendance') }}</h1>
                 <div class="flex items-center space-x-2">
                     <span class="text-sm">{{ Auth::user()->name }}</span>
-                    <a href="{{ route('teacher.logout') }}" class="text-sm underline">{{ __('attendance.logout') }}</a>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-sm text-white underline hover:text-blue-200 transition-colors">
+                            {{ __('attendance.logout') }}
+                        </button>
+                    </form>
                 </div>
             </div>
             <div class="text-sm mt-2">

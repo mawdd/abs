@@ -30,15 +30,17 @@ class AttendanceLocationResource extends Resource
                 Forms\Components\TextInput::make('latitude')
                     ->required()
                     ->numeric()
-                    ->step(0.00000001)
+                    ->step(0.000000000001)
                     ->minValue(-90)
-                    ->maxValue(90),
+                    ->maxValue(90)
+                    ->helperText('High precision GPS latitude (up to 12 decimal places)'),
                 Forms\Components\TextInput::make('longitude')
                     ->required()
                     ->numeric()
-                    ->step(0.00000001)
+                    ->step(0.000000000001)
                     ->minValue(-180)
-                    ->maxValue(180),
+                    ->maxValue(180)
+                    ->helperText('High precision GPS longitude (up to 12 decimal places)'),
                 Forms\Components\TextInput::make('radius_meters')
                     ->required()
                     ->numeric()
@@ -63,9 +65,15 @@ class AttendanceLocationResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('latitude')
-                    ->numeric(decimalPlaces: 6),
+                    ->numeric(decimalPlaces: 8)
+                    ->copyable()
+                    ->copyMessage('Latitude copied')
+                    ->tooltip('Click to copy'),
                 Tables\Columns\TextColumn::make('longitude')
-                    ->numeric(decimalPlaces: 6),
+                    ->numeric(decimalPlaces: 8)
+                    ->copyable() 
+                    ->copyMessage('Longitude copied')
+                    ->tooltip('Click to copy'),
                 Tables\Columns\TextColumn::make('radius_meters')
                     ->numeric()
                     ->suffix(' m'),
