@@ -7,6 +7,8 @@ $debug_files = [
     'hosting_quick_fix.php', 
     'test_assets.html',
     'test_filament.php',
+    'test_dashboard_complete.php',
+    'seed_dashboard_data.php',
     'cleanup_debug.php' // This file itself
 ];
 
