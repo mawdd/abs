@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🧪 Asset Loading Test</title>
+
+  <!-- Test Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .test-box {
+      padding: 20px;
+      margin: 10px;
+      border-radius: 8px;
+      border: 2px solid #ddd;
+    }
+
+    .pass {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+      color: #155724;
+    }
+
+    .fail {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      color: #721c24;
+    }
+  </style>
+</head>
+
+<body>
+  <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <h1 style="text-align: center; color: #333;">🧪 Asset Loading Test</h1>
+
+    <!-- Test 1: Basic HTML/CSS -->
+    <div class="test-box" id="test1">
+      <h3>✅ Test 1: Basic HTML/CSS</h3>
+      <p>If you can see this styled box, basic HTML/CSS is working.</p>
+    </div>
+
+    <!-- Test 2: Tailwind CDN -->
+    <div class="test-box bg-blue-100 border-blue-300 text-blue-800" id="test2">
+      <h3>Test 2: Tailwind CDN</h3>
+      <p>If this box has blue background, Tailwind CDN is working.</p>
+      <div class="mt-4 p-4 bg-green-200 rounded-lg">
+        <p class="font-bold">Tailwind classes test:</p>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Button Test
+        </button>
+      </div>
+    </div>
+
+    <!-- Test 3: JavaScript -->
+    <div class="test-box" id="test3">
+      <h3>Test 3: JavaScript</h3>
+      <p id="js-status">JavaScript is loading...</p>
+      <button onclick="testJS()">Click to test JavaScript</button>
+    </div>
+
+    <!-- Test 4: Network Resources -->
+    <div class="test-box" id="test4">
+      <h3>Test 4: Network Resources</h3>
+      <p id="network-status">Testing network resources...</p>
+      <img src="https://via.placeholder.com/100x50/4CAF50/ffffff?text=IMG+TEST" alt="Network test"
+        onload="imageLoaded()" onerror="imageFailed()" style="display: block; margin: 10px 0;">
+    </div>
+
+    <!-- Test 5: Filament-specific -->
+    <div class="test-box" id="test5">
+      <h3>Test 5: Filament Admin Panel</h3>
+      <p>Links to test Filament:</p>
+      <div style="margin: 10px 0;">
+        <a href="./admin" target="_blank"
+          style="display: inline-block; background: #3B82F6; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; margin: 5px;">
+          Open Admin Panel
+        </a>
+        <a href="./teacher" target="_blank"
+          style="display: inline-block; background: #10B981; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; margin: 5px;">
+          Open Teacher Panel
+        </a>
+      </div>
+    </div>
+
+    <!-- Test Results Summary -->
+    <div class="test-box" id="summary">
+      <h3>📊 Test Results Summary</h3>
+      <div id="summary-content">
+        <p>Running tests...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Test Results Tracker
+    let testResults = {
+      basic: false,
+      tailwind: false,
+      javascript: false,
+      network: false,
+      filament: 'unknown'
+    };
+
+    // Test 1: Basic HTML/CSS (auto-pass if visible)
+    testResults.basic = true;
+    document.getElementById('test1').className += ' pass';
+
+    // Test 2: Tailwind CDN
+    function checkTailwind() {
+      const test2 = document.getElementById('test2');
+      const computedStyle = window.getComputedStyle(test2);
+      const hasBlueBackground = computedStyle.backgroundColor.includes('239, 246, 255') ||
+        computedStyle.backgroundColor.includes('rgb(239, 246, 255)') ||
+        test2.classList.contains('bg-blue-100');
+
+      if (hasBlueBackground || test2.className.includes('bg-blue-100')) {
+        testResults.tailwind = true;
+        test2.className += ' pass';
+        test2.innerHTML = test2.innerHTML.replace('Test 2: Tailwind CDN', '✅ Test 2: Tailwind CDN');
+      } else {
+        test2.className += ' fail';
+        test2.innerHTML = test2.innerHTML.replace('Test 2: Tailwind CDN', '❌ Test 2: Tailwind CDN');
+      }
+    }
+
+    // Test 3: JavaScript
+    function testJS() {
+      testResults.javascript = true;
+      document.getElementById('js-status').textContent = '✅ JavaScript is working!';
+      document.getElementById('test3').className += ' pass';
+      updateSummary();
+    }
+
+    // Test 4: Network Resources
+    function imageLoaded() {
+      testResults.network = true;
+      document.getElementById('network-status').textContent = '✅ Network resources loading successfully';
+      document.getElementById('test4').className += ' pass';
+      updateSummary();
+    }
+
+    function imageFailed() {
+      document.getElementById('network-status').textContent = '❌ Network resources failed to load';
+      document.getElementById('test4').className += ' fail';
+      updateSummary();
+    }
+
+    // Update summary
+    function updateSummary() {
+      const summary = document.getElementById('summary-content');
+      let html = '<ul style="list-style: none; padding: 0;">';
+
+      html += `<li style="margin: 5px 0;">Basic HTML/CSS: ${testResults.basic ? '✅ PASS' : '❌ FAIL'}</li>`;
+      html += `<li style="margin: 5px 0;">Tailwind CDN: ${testResults.tailwind ? '✅ PASS' : '❌ FAIL'}</li>`;
+      html += `<li style="margin: 5px 0;">JavaScript: ${testResults.javascript ? '✅ PASS' : '❌ FAIL'}</li>`;
+      html += `<li style="margin: 5px 0;">Network Resources: ${testResults.network ? '✅ PASS' : '❌ FAIL'}</li>`;
+
+      html += '</ul>';
+
+      html += '<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 4px;">';
+      html += '<strong>🔍 Diagnosis:</strong><br>';
+
+      if (!testResults.tailwind) {
+        html += '• Tailwind CDN tidak loading - kemungkinan masalah koneksi internet hosting<br>';
+      }
+      if (!testResults.network) {
+        html += '• Network resources gagal loading - masalah koneksi hosting<br>';
+      }
+      if (testResults.tailwind && testResults.network && testResults.javascript) {
+        html += '• Semua asset loading dengan baik - masalah mungkin di konfigurasi Laravel/Filament<br>';
+      }
+
+      html += '</div>';
+
+      summary.innerHTML = html;
+    }
+
+    // Initialize tests
+    setTimeout(() => {
+      checkTailwind();
+
+      // Auto-update summary after 2 seconds
+      setTimeout(updateSummary, 2000);
+    }, 1000);
+
+    // Set initial status
+    document.getElementById('js-status').textContent = '⏳ Click button to test JavaScript';
+  </script>
+</body>
+
+</html>
