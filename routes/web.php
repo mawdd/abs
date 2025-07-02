@@ -140,10 +140,10 @@ Route::get('/', [AuthController::class, 'loginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Redirect all login attempts to main login page
-Route::get('/admin/login', function () {
-    return redirect()->route('login')->with('info', 'Silakan gunakan halaman login utama.');
-});
+// Redirect only teacher login attempts to main login page
+// Route::get('/admin/login', function () {
+//     return redirect()->route('login')->with('info', 'Silakan gunakan halaman login utama.');
+// });
 
 Route::get('/teacher/login', function () {
     return redirect()->route('login')->with('info', 'Silakan gunakan halaman login utama.');
