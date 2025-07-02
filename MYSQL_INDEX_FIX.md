@@ -12,7 +12,7 @@ SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too lo
 
 -   MySQL using `utf8mb4` charset (4 bytes per character)
 -   Default VARCHAR(255) = 255 × 4 = 1020 bytes > 1000 bytes limit
--   Affects columns: `users.email`, `password_reset_tokens.email`, `sessions.id`
+-   Affects columns: `users.email`, `password_reset_tokens.email`, `sessions.id`, `permissions.name+guard_name`, `roles.name+guard_name`, `model_type` fields
 
 ## Solution Applied
 
@@ -24,10 +24,18 @@ Changed string column lengths in migration:
 // Before
 $table->string('email')->unique();
 $table->string('id')->primary();
+$table->string('name');        // In permissions/roles
+$table->string('guard_name');  // In permissions/roles
+$table->string('model_type');  // In morph tables
 
 // After
-$table->string('email', 191)->unique();  // 191 × 4 = 764 bytes ✓
-$table->string('id', 191)->primary();    // 191 × 4 = 764 bytes ✓
+$table->string('email', 191)->unique();     // 191 × 4 = 764 bytes ✓
+$table->string('id', 191)->primary();       // 191 × 4 = 764 bytes ✓
+$table->string('name', 125);                // 125 × 4 = 500 bytes ✓
+$table->string('guard_name', 25);           // 25 × 4 = 100 bytes ✓
+$table->string('model_type', 191);          // 191 × 4 = 764 bytes ✓
+
+// Composite unique: name(125) + guard_name(25) = 150 × 4 = 600 bytes ✓
 ```
 
 ### 2. AppServiceProvider Global Fix
@@ -52,6 +60,7 @@ public function boot(): void
 -   ✅ `database/migrations/0001_01_01_000001_create_cache_table.php`
 -   ✅ `database/migrations/0001_01_01_000002_create_jobs_table.php`
 -   ✅ `database/migrations/2025_05_18_060809_create_device_registrations_table.php`
+-   ✅ `database/migrations/2025_05_18_062616_create_permission_tables.php` ⭐ **MAJOR FIX**
 -   ✅ `database/migrations/2025_05_18_100000_create_students_table.php`
 -   ✅ `database/migrations/2025_05_18_100004_create_system_settings_table.php`
 -   ✅ `app/Providers/AppServiceProvider.php`
