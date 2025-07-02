@@ -13,6 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class SchedulesRelationManager extends RelationManager
 {
     protected static string $relationship = 'schedules';
+    
+    protected static ?string $title = 'Jadwal';
+    
+    protected static ?string $modelLabel = 'Jadwal Kelas';
+    
+    protected static ?string $pluralModelLabel = 'Jadwal Kelas';
 
     public function form(Form $form): Form
     {
@@ -22,34 +28,39 @@ class SchedulesRelationManager extends RelationManager
                     ->relationship('classRoom', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->label('Ruang Kelas'),
                 Forms\Components\Select::make('teacher_id')
                     ->relationship('teacher', 'name')
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->label('Teacher'),
+                    ->label('Guru'),
                 Forms\Components\Select::make('day_of_week')
                     ->options([
-                        1 => 'Monday',
-                        2 => 'Tuesday',
-                        3 => 'Wednesday',
-                        4 => 'Thursday',
-                        5 => 'Friday',
-                        6 => 'Saturday',
-                        7 => 'Sunday',
+                        1 => 'Senin',
+                        2 => 'Selasa',
+                        3 => 'Rabu',
+                        4 => 'Kamis',
+                        5 => 'Jumat',
+                        6 => 'Sabtu',
+                        7 => 'Minggu',
                     ])
-                    ->required(),
+                    ->required()
+                    ->label('Hari'),
                 Forms\Components\TimePicker::make('start_time')
                     ->seconds(false)
-                    ->required(),
+                    ->required()
+                    ->label('Waktu Mulai'),
                 Forms\Components\TimePicker::make('end_time')
                     ->seconds(false)
                     ->required()
-                    ->after('start_time'),
+                    ->after('start_time')
+                    ->label('Waktu Selesai'),
                 Forms\Components\Toggle::make('is_active')
                     ->default(true)
-                    ->required(),
+                    ->required()
+                    ->label('Aktif'),
             ]);
     }
 
@@ -60,10 +71,12 @@ class SchedulesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('classRoom.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Ruang Kelas'),
                 Tables\Columns\TextColumn::make('teacher.name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Guru'),
                 Tables\Columns\TextColumn::make('day_name')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
@@ -71,26 +84,28 @@ class SchedulesRelationManager extends RelationManager
                         'Tuesday', 'Thursday' => 'success',
                         'Saturday', 'Sunday' => 'warning',
                         default => 'gray',
-                    }),
+                    })
+                    ->label('Hari'),
                 Tables\Columns\TextColumn::make('time_range')
-                    ->label('Time'),
+                    ->label('Waktu'),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Aktif'),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                Tables\Actions\CreateAction::make()->label('Buat Jadwal'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus'),
                 ]),
             ]);
     }

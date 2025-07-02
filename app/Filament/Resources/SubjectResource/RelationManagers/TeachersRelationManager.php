@@ -27,22 +27,42 @@ class TeachersRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('user.name')
+            ->recordTitleAttribute('qualification')
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('user'))
             ->columns([
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Name')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('qualification')
-                    ->searchable(),
+                    ->label('Qualification')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('specialization')
-                    ->searchable(),
+                    ->label('Specialization')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Teacher Name')
+                    ->searchable(false)
+                    ->sortable(false),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\AttachAction::make()
-                    ->preloadRecordSelect(),
+                    ->form(fn (Tables\Actions\AttachAction $action): array => [
+                        Forms\Components\Select::make('recordId')
+                            ->label('Select Teacher')
+                            ->options(function () {
+                                return \App\Models\TeacherProfile::with('user')->get()->mapWithKeys(function ($record) {
+                                    $label = $record->user?->name ?? 'Teacher #' . $record->id;
+                                    if ($record->qualification) {
+                                        $label .= ' (' . $record->qualification . ')';
+                                    }
+                                    return [$record->id => $label];
+                                });
+                            })
+                            ->searchable()
+                            ->required(),
+                    ]),
             ])
             ->actions([
                 Tables\Actions\DetachAction::make(),

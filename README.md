@@ -1,61 +1,307 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Teacher Attendance Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A comprehensive web-based attendance system designed to prevent attendance fraud (jockeying) and provide accurate records for daily teacher attendance and student attendance during teaching sessions.
 
-## About Laravel
+## Key Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Anti-Jockeying (Fraud Prevention) Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+-   **GPS Location Validation**: Automatic validation of teacher location against configured school coordinates
+-   **Device Registration**: Automatic device linking to prevent attendance from unauthorized devices
+-   **Holiday Integration**: Automatic holiday validation to exclude non-working days
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### For Teachers (Mobile Web Interface)
 
-## Learning Laravel
+-   **Daily Attendance**: Simple check-in/check-out with GPS validation
+-   **Teaching Session Management**: Start/end teaching sessions with student attendance tracking
+-   **Personal History**: View attendance and teaching session history
+-   **Multi-language Support**: Indonesian and English interface
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### For Administrators (FilamentPHP Panel)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-   **Teacher Management**: CRUD operations for teachers with device management
+-   **Student Management**: Complete student information management
+-   **Attendance Monitoring**: Real-time attendance tracking with location validation
+-   **Reports & Analytics**: Comprehensive reporting with export capabilities
+-   **System Configuration**: GPS locations, holidays, and system settings
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Technology Stack
 
-## Laravel Sponsors
+-   **Backend**: Laravel 12 (PHP 8.2+)
+-   **Admin Panel**: FilamentPHP 3.3
+-   **Database**: MySQL
+-   **Authentication**: Laravel Sanctum
+-   **Frontend**: Blade templates with Tailwind CSS
+-   **GPS**: Browser Geolocation API
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Installation Instructions
 
-### Premium Partners
+### 1. System Requirements
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+-   PHP 8.2 or higher
+-   Composer
+-   MySQL 8.0 or higher
+-   Node.js & npm (for frontend assets)
 
-## Contributing
+### 2. Installation Steps
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```bash
+# Clone the repository
+git clone <repository-url>
+cd attendance-management-system
 
-## Code of Conduct
+# Install PHP dependencies
+composer install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Copy environment file
+cp .env.example .env
 
-## Security Vulnerabilities
+# Generate application key
+php artisan key:generate
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Configure database in .env file
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=attendance_system
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+
+# Run migrations
+php artisan migrate
+
+# Run seeders to create initial data
+php artisan db:seed
+
+# Install and build frontend assets (if needed)
+npm install
+npm run build
+
+# Start the development server
+php artisan serve
+```
+
+### 3. Initial Setup
+
+After installation, the system will be pre-configured with:
+
+**Admin Access:**
+
+-   URL: `http://localhost:8000/admin`
+-   Email: `admin@attendance.com`
+-   Password: `password123`
+
+**Sample Teacher Access:**
+
+-   URL: `http://localhost:8000/teacher/login`
+-   Email: `ahmad.fauzi@school.com` (or any teacher from seeders)
+-   Password: `teacher123`
+
+### 4. GPS Location Configuration
+
+⚠️ **IMPORTANT**: Update the GPS coordinates for your school location:
+
+1. Login to admin panel
+2. Navigate to **System Settings > Attendance Locations**
+3. Edit the "Main School Building" location
+4. Update latitude and longitude with your actual school coordinates
+5. Adjust the radius as needed (default: 100 meters)
+
+### 5. System Settings Configuration
+
+Configure the following settings in **System Settings**:
+
+-   **Default Language**: Set to `id` (Indonesian) or `en` (English)
+-   **School Name**: Update with your school's name
+-   **Location Tolerance**: Adjust GPS tolerance radius
+-   **Holiday Validation**: Enable/disable holiday checking
+
+## Usage Guide
+
+### For Teachers
+
+1. **Access the System**:
+
+    - Visit `http://yoursite.com/teacher/login`
+    - Login with provided credentials
+
+2. **Daily Attendance**:
+
+    - Allow location access when prompted
+    - Click "Check In" when arriving at school
+    - Click "Check Out" when leaving school
+    - System validates GPS location automatically
+
+3. **Teaching Sessions**:
+
+    - Start a teaching session by selecting subject and class
+    - Mark student attendance during the session
+    - End the session when completed
+
+4. **View History**:
+    - Check personal attendance history
+    - Review teaching session records
+
+### For Administrators
+
+1. **Access Admin Panel**:
+
+    - Visit `http://yoursite.com/admin`
+    - Login with admin credentials
+
+2. **Teacher Management**:
+
+    - Add/edit teacher information
+    - Reset teacher passwords
+    - Manage device registrations
+
+3. **Attendance Monitoring**:
+
+    - View real-time attendance data
+    - Monitor location validation status
+    - Generate reports
+
+4. **System Configuration**:
+    - Configure GPS locations
+    - Manage holidays
+    - Update system settings
+
+## API Endpoints
+
+The system provides RESTful API endpoints for mobile app integration:
+
+### Authentication
+
+```
+POST /api/teacher/login
+GET  /api/teacher/profile
+POST /api/teacher/logout
+```
+
+### Daily Attendance
+
+```
+GET  /api/teacher/attendance/today
+POST /api/teacher/attendance/check-in
+POST /api/teacher/attendance/check-out
+GET  /api/teacher/attendance/history
+```
+
+### Teaching Sessions
+
+```
+GET  /api/teacher/sessions/current
+POST /api/teacher/sessions/start
+POST /api/teacher/sessions/{id}/end
+GET  /api/teacher/sessions/{id}/students
+POST /api/teacher/sessions/{id}/attendance
+```
+
+## Security Features
+
+### Anti-Fraud Mechanisms
+
+1. **Device Registration**:
+
+    - Automatic device fingerprinting using browser characteristics
+    - One device per teacher policy
+    - Admin can reset device registrations
+
+2. **GPS Validation**:
+
+    - Real-time location verification
+    - Configurable tolerance radius
+    - Invalid location warnings and logging
+
+3. **Holiday Integration**:
+    - Automatic holiday checking
+    - Prevents unnecessary attendance on holidays
+    - Configurable holiday calendar
+
+### Data Protection
+
+-   Secure password hashing
+-   API token authentication
+-   Input validation and sanitization
+-   SQL injection prevention
+-   XSS protection
+
+## Database Schema
+
+### Core Tables
+
+-   `users` - Teacher and admin accounts
+-   `attendances` - Daily attendance records
+-   `teaching_sessions` - Teaching session records
+-   `student_attendances` - Student attendance within sessions
+-   `students` - Student information
+-   `class_rooms` - Classroom data
+-   `subjects` - Subject information
+-   `holidays` - Holiday calendar
+-   `attendance_locations` - GPS validation points
+-   `device_registrations` - Device management
+-   `system_settings` - Configuration settings
+
+## Troubleshooting
+
+### Common Issues
+
+1. **GPS Not Working**:
+
+    - Ensure HTTPS is enabled (required for geolocation)
+    - Check browser permissions for location access
+    - Verify GPS coordinates are correctly configured
+
+2. **Device Registration Issues**:
+
+    - Clear browser cache and cookies
+    - Admin can reset device registration in admin panel
+    - Check if teacher has multiple devices registered
+
+3. **Location Validation Failing**:
+    - Verify school GPS coordinates are accurate
+    - Adjust tolerance radius if needed
+    - Check if teacher is within the configured area
+
+### Performance Optimization
+
+-   Enable database indexing on frequently queried columns
+-   Use Laravel caching for system settings
+-   Optimize GPS calculation queries
+-   Regular database maintenance
+
+## Customization
+
+### Adding New Languages
+
+1. Create language files in `lang/{locale}/attendance.php`
+2. Update system settings to include new language
+3. Modify frontend templates to support new language
+
+### Custom Reports
+
+1. Create new Filament resources for custom reports
+2. Use Laravel Excel for export functionality
+3. Implement custom widgets for dashboard analytics
+
+### Integration with Other Systems
+
+-   Use provided API endpoints for mobile app integration
+-   Implement webhooks for external system notifications
+-   Export data using Laravel Excel or custom formats
+
+## Support
+
+For technical support or feature requests, please:
+
+1. Check the troubleshooting section
+2. Review the documentation
+3. Contact system administrator
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is proprietary software. All rights reserved.
+
+---
+
+**Note**: This system is designed specifically for educational institutions to ensure accurate attendance tracking and prevent fraud. Please ensure compliance with local data protection regulations when implementing.

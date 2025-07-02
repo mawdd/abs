@@ -107,9 +107,9 @@ class ClassScheduleResource extends Resource
                 Tables\Columns\TextColumn::make('day_name')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'Monday', 'Wednesday', 'Friday' => 'primary',
-                        'Tuesday', 'Thursday' => 'success',
-                        'Saturday', 'Sunday' => 'warning',
+                        'Senin', 'Rabu', 'Jumat' => 'primary',
+                        'Selasa', 'Kamis' => 'success',
+                        'Sabtu', 'Minggu' => 'warning',
                         default => 'gray',
                     })
                     ->sortable(query: fn (Builder $query, string $direction): Builder => $query->orderBy('day_of_week', $direction))

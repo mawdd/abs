@@ -34,14 +34,17 @@ class TeacherProfileResource extends Resource
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->label('Teacher'),
+                    ->label('Guru'),
                 Forms\Components\TextInput::make('qualification')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Kualifikasi'),
                 Forms\Components\Textarea::make('bio')
                     ->maxLength(65535)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->label('Biografi'),
                 Forms\Components\TextInput::make('specialization')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Spesialisasi'),
                 Forms\Components\FileUpload::make('profile_photo')
                     ->image()
                     ->directory('teacher-photos')
@@ -49,7 +52,8 @@ class TeacherProfileResource extends Resource
                     ->imageResizeMode('cover')
                     ->imageCropAspectRatio('1:1')
                     ->imageResizeTargetWidth('300')
-                    ->imageResizeTargetHeight('300'),
+                    ->imageResizeTargetHeight('300')
+                    ->label('Foto Profil'),
             ])
             ->columns(2);
     }
@@ -57,44 +61,51 @@ class TeacherProfileResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->with('user'))
             ->columns([
                 Tables\Columns\ImageColumn::make('profile_photo')
                     ->circular()
                     ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->user?->name ?? 'Teacher') . '&color=FFFFFF&background=6366F1')
-                    ->label('Photo'),
+                    ->label('Foto'),
                 Tables\Columns\TextColumn::make('user.name')
                     ->searchable()
                     ->sortable()
-                    ->label('Name'),
+                    ->label('Nama'),
                 Tables\Columns\TextColumn::make('user.email')
                     ->searchable()
                     ->sortable()
                     ->label('Email'),
                 Tables\Columns\TextColumn::make('qualification')
                     ->searchable()
-                    ->limit(30),
+                    ->limit(30)
+                    ->label('Kualifikasi'),
                 Tables\Columns\TextColumn::make('specialization')
                     ->searchable()
-                    ->badge(),
+                    ->badge()
+                    ->label('Spesialisasi'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Dibuat Pada'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Diperbarui Pada'),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('specialization')
                     ->options(function () {
                         return TeacherProfile::distinct()->pluck('specialization', 'specialization')->toArray();
-                    }),
+                    })
+                    ->label('Spesialisasi'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
                 Tables\Actions\Action::make('view_schedule')
+                    ->label('Lihat Jadwal')
                     ->icon('heroicon-o-calendar')
                     ->url(fn (TeacherProfile $record) => route('filament.admin.resources.class-schedules.index', [
                         'tableFilters[teacher][value]' => $record->user_id,
@@ -103,7 +114,7 @@ class TeacherProfileResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus'),
                 ]),
             ]);
     }

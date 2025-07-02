@@ -31,4 +31,12 @@ class Subject extends Model
     {
         return $this->belongsToMany(TeacherProfile::class, 'teacher_subjects');
     }
+    
+    /**
+     * Get the teaching sessions for this subject.
+     */
+    public function teachingSessions(): HasMany
+    {
+        return $this->hasMany(TeachingSession::class);
+    }
 }

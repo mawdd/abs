@@ -117,4 +117,12 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasOne(TeacherProfile::class);
     }
+    
+    /**
+     * Get all teaching sessions for the user (if teacher).
+     */
+    public function teachingSessions(): HasMany
+    {
+        return $this->hasMany(TeachingSession::class, 'teacher_id');
+    }
 }

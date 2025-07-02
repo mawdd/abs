@@ -23,16 +23,21 @@ class SubjectResource extends Resource
     
     protected static ?string $navigationGroup = 'Manajemen Akademik';
 
+    protected static ?string $modelLabel = 'Mata Pelajaran';
+    protected static ?string $pluralModelLabel = 'Mata Pelajaran';
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Nama'),
                 Forms\Components\Textarea::make('description')
                     ->maxLength(65535)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->label('Deskripsi'),
             ]);
     }
 
@@ -42,34 +47,39 @@ class SubjectResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->label('Nama'),
                 Tables\Columns\TextColumn::make('description')
                     ->limit(50)
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Deskripsi'),
                 Tables\Columns\TextColumn::make('teachers_count')
                     ->counts('teachers')
-                    ->label('Teachers')
+                    ->label('Guru')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('schedules_count')
                     ->counts('schedules')
-                    ->label('Classes')
+                    ->label('Kelas')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Dibuat Pada'),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Diperbarui Pada'),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make()->label('Edit'),
+                Tables\Actions\DeleteAction::make()->label('Hapus'),
                 Tables\Actions\Action::make('view_schedules')
+                    ->label('Lihat Jadwal')
                     ->icon('heroicon-o-calendar')
                     ->url(fn (Subject $record) => route('filament.admin.resources.class-schedules.index', [
                         'tableFilters[subject][value]' => $record->id,
@@ -78,7 +88,7 @@ class SubjectResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()->label('Hapus'),
                 ]),
             ]);
     }

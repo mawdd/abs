@@ -57,16 +57,16 @@ class ClassSchedule extends Model
     public function getDayNameAttribute(): string
     {
         $days = [
-            1 => 'Monday',
-            2 => 'Tuesday',
-            3 => 'Wednesday',
-            4 => 'Thursday',
-            5 => 'Friday',
-            6 => 'Saturday',
-            7 => 'Sunday',
+            1 => 'Senin',
+            2 => 'Selasa',
+            3 => 'Rabu',
+            4 => 'Kamis',
+            5 => 'Jumat',
+            6 => 'Sabtu',
+            7 => 'Minggu',
         ];
         
-        return $days[$this->day_of_week] ?? 'Unknown';
+        return $days[$this->day_of_week] ?? 'Tidak Diketahui';
     }
     
     /**

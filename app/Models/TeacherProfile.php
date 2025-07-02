@@ -19,6 +19,8 @@ class TeacherProfile extends Model
         'profile_photo',
     ];
 
+    protected $with = ['user'];
+
     /**
      * Get the user that owns the profile.
      */
@@ -33,5 +35,18 @@ class TeacherProfile extends Model
     public function subjects()
     {
         return $this->belongsToMany(Subject::class, 'teacher_subjects');
+    }
+
+    /**
+     * String representation of the model for display purposes.
+     */
+    public function __toString(): string
+    {
+        // Ensure the user relationship is loaded
+        if (!$this->relationLoaded('user')) {
+            $this->load('user');
+        }
+        
+        return $this->user?->name ?? 'Teacher #' . $this->id;
     }
 }
